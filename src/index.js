@@ -1,17 +1,34 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { BrowserRouter, Route, Link, Switch } from "react-router-dom";
+import Home from "./components/Home";
+import UserList from "./components/UserList";
+import UserAdd from "./components/UserAdd";
+import { KeepAliveProvider, withKeepAlive } from './keepalive'
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const KeepAliveHome = withKeepAlive(Home, { cacheId: 'Home' });
+const KeepAliveUserList = withKeepAlive(UserList, { cacheId: 'UserList', scroll: true });
+const KeepAliveUserAdd = withKeepAlive(UserAdd, { cacheId: 'UserAdd' });
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+const App = () => {
+  return (
+    <BrowserRouter>
+      <KeepAliveProvider>
+        <Route>
+          <ul>
+            <li><Link to="/">首页</Link></li>
+            <li><Link to="/list">用户列表</Link></li>
+            <li><Link to="/add">添加用户</Link></li>
+          </ul>
+        </Route>
+        <Switch>
+          <Route path="/" component={KeepAliveHome} exact />
+          <Route path="/list" component={KeepAliveUserList} />
+          <Route path="/add" component={KeepAliveUserAdd} />
+        </Switch>
+      </KeepAliveProvider>
+    </BrowserRouter>
+  )
+}
+
+ReactDOM.render(<App />, document.getElementById('root'))
